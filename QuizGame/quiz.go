@@ -3,22 +3,25 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"math/rand"
 	"os"
 	"strings"
 	"time"
 )
 
-func quiz(quizRecord [][]string, quizTime int) {
+func quiz(filename string, quizTime int, shuf bool) {
+
+	quizRecord := csvReader(filename)
+
+	if shuf == true {
+		quizRecord = shuffleQuestions(quizRecord)
+	}
 
 	correctCount := 0
 
 	ansChan := make(chan string)
 
-	fmt.Println("About to Start Timer")
-
 	ticker := time.NewTicker(time.Duration(quizTime) * time.Second)
-
-	fmt.Println("timer Started")
 
 	for id, quesAns := range quizRecord {
 		ques := quesAns[0]
@@ -32,7 +35,7 @@ func quiz(quizRecord [][]string, quizTime int) {
 			fmt.Println("Questions Correctly Answered : ", correctCount)
 			return
 		case input := <-ansChan:
-			if strings.TrimRight(input, "\n") == ans {
+			if cleanString(input) == cleanString(ans) {
 				correctCount++
 			}
 			break
@@ -46,4 +49,20 @@ func getAnswer(ansChan chan string) {
 	reader := bufio.NewReader(os.Stdin)
 	input, _ := reader.ReadString('\n')
 	ansChan <- input
+}
+
+func cleanString(s string) string {
+	s = strings.TrimRight(s, "\n")
+	s = strings.ToLower(s)
+	return s
+}
+
+func shuffleQuestions(slice [][]string) [][]string {
+	r := rand.New(rand.NewSource(time.Now().Unix()))
+
+	for n := len(slice); n > 0; n-- {
+		randIndex := r.Intn(n)
+		slice[n-1], slice[randIndex] = slice[randIndex], slice[n-1]
+	}
+	return slice
 }
