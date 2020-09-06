@@ -1,18 +1,17 @@
 package main
 
 import (
-	"os"
+	"flag"
+)
+
+var (
+	file  = flag.String("csv", "problems.csv", "a csv file in the format 'question,answer'")
+	limit = flag.Int("limit", 10, "the time limit for the quiz in seconds")
 )
 
 func main() {
-	args := os.Args[1:]
-	filename := "problems.csv"
+	filename := *file
+	quizTime := *limit
 
-	// fmt.Println(len(args))
-	// fmt.Println(args[0])
-
-	if len(args) > 0 {
-		filename = args[0]
-	}
-	quiz(csvReader(filename))
+	quiz(csvReader(filename), quizTime)
 }
