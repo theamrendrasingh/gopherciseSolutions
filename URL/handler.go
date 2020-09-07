@@ -2,8 +2,16 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
+
+	"gopkg.in/yaml.v2"
 )
+
+type yamlUrls struct {
+	Path string `yaml: "path"`
+	Url  string `yaml: "url"`
+}
 
 // MapHandler will return an http.HandlerFunc (which also
 // implements http.Handler) that will attempt to map any
@@ -40,17 +48,41 @@ func MapHandler(pathsToUrls map[string]string, fallback http.Handler) http.Handl
 // a mapping of paths to urls.
 func YAMLHandler(yml []byte, fallback http.Handler) (http.HandlerFunc, error) {
 	// // TODO: Implement this...
-	return nil, nil
 
+	parsedYml, err := parseYAML(yml)
 	// parsedYaml, err := parseYAML(yaml)
-	// if err != nil {
-	// 	return nil, err
-	// }
+	if err != nil {
+		return nil, err
+	}
+
+	mapUrl := parsedYAMLToMap(parsedYml)
+
+	// fmt.Println(mapUrl)
+
+	// return nil, nil
+
 	// pathMap := buildMap(parsedYaml)
-	// return MapHandler(pathMap, fallback), nil
+	return MapHandler(mapUrl, fallback), nil
 
 }
 
-// func parseYAML(){
-// 	returnn nil, nil
-// }
+func parseYAML(yml []byte) ([]yamlUrls, error) {
+	var Urls []yamlUrls
+	err := yaml.Unmarshal(yml, &Urls)
+	if err != nil {
+		fmt.Println("Error parsing yaml")
+		panic(err)
+	}
+
+	// fmt.Printf("%#v\n", Urls)
+
+	return Urls, err
+}
+
+func parsedYAMLToMap(parsedYAML []yamlUrls) map[string]string {
+	urlMap := make(map[string]string)
+	for _, y := range parsedYAML {
+		urlMap[y.Path] = y.Url
+	}
+	return urlMap
+}

@@ -2,7 +2,9 @@ package main
 
 import (
 	"fmt"
+	"io/ioutil"
 	"net/http"
+	"path/filepath"
 	// "github.com/gophercises/urlshort"
 )
 
@@ -24,13 +26,22 @@ func main() {
 	// 		- path: /urlshort-final
 	// 		url: https://github.com/gophercises/urlshort/tree/solution
 	// 		`
-	// yamlHandler, err := YAMLHandler([]byte(yaml), mapHandler)
-	// if err != nil {
-	// 	panic(err)
-	// }
+
+	filename, _ := filepath.Abs("./test.yml")
+	yaml, err := ioutil.ReadFile(filename)
+
+	if err != nil {
+		fmt.Println("Error reading yaml file")
+		panic(err)
+	}
+
+	yamlHandler, err := YAMLHandler([]byte(yaml), mapHandler)
+	if err != nil {
+		panic(err)
+	}
 	fmt.Println("Starting the server on :8080")
-	// http.ListenAndServe(":8080", yamlHandler)
-	http.ListenAndServe(":8080", mapHandler)
+	http.ListenAndServe(":8080", yamlHandler)
+	// http.ListenAndServe(":8080", mapHandler)
 }
 
 func defaultMux() *http.ServeMux {
