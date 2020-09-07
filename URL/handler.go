@@ -50,20 +50,12 @@ func YAMLHandler(yml []byte, fallback http.Handler) (http.HandlerFunc, error) {
 	// // TODO: Implement this...
 
 	parsedYml, err := parseYAML(yml)
-	// parsedYaml, err := parseYAML(yaml)
 	if err != nil {
 		return nil, err
 	}
 
 	mapUrl := parsedYAMLToMap(parsedYml)
-
-	// fmt.Println(mapUrl)
-
-	// return nil, nil
-
-	// pathMap := buildMap(parsedYaml)
 	return MapHandler(mapUrl, fallback), nil
-
 }
 
 func parseYAML(yml []byte) ([]yamlUrls, error) {
@@ -73,8 +65,6 @@ func parseYAML(yml []byte) ([]yamlUrls, error) {
 		fmt.Println("Error parsing yaml")
 		panic(err)
 	}
-
-	// fmt.Printf("%#v\n", Urls)
 
 	return Urls, err
 }
